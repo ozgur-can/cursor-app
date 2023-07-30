@@ -16,6 +16,7 @@
   <div class="cursor" id="cursor"></div>
 
   <!-- Load Firebase JavaScript SDK -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
 
@@ -38,17 +39,24 @@
     // Get a reference to the Firebase Realtime Database
     var database = firebase.database();
 
-    // Track cursor position and update in the database
-    document.addEventListener('mousemove', function(event) {
-      var cursor = document.getElementById('cursor');
-      cursor.style.left = event.pageX + 'px';
-      cursor.style.top = event.pageY + 'px';
+    function setup() {
+      createCanvas(windowWidth, windowHeight);
+      noCursor();
+    }
+
+    function draw() {
+      background(255);
+      fill(255, 0, 0);
+      ellipse(mouseX, mouseY, 10, 10);
+    }
+
+    function mouseMoved() {
       // Update cursor position in the database
       database.ref('cursors').child(firebase.auth().currentUser.uid).set({
-        x: event.pageX,
-        y: event.pageY
+        x: mouseX,
+        y: mouseY
       });
-    });
+    }
   </script>
 </body>
 </html>
