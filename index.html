@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Real-time Cursor Tracker</title>
+  <style>
+    .cursor {
+      width: 10px;
+      height: 10px;
+      background-color: red;
+      position: absolute;
+    }
+  </style>
+</head>
+<body>
+  <!-- Cursor container for each user -->
+  <div class="cursor" id="cursor"></div>
+
+  <!-- Load Firebase JavaScript SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+
+  <!-- Your Firebase configuration -->
+  <script>
+    const firebaseConfig = {
+  apiKey: "AIzaSyBFm3WQsHM8ZGb-9gf4uP-kWm5xmZ419ig",
+  authDomain: "cursor-app-e1bb3.firebaseapp.com",
+  databaseURL: "https://cursor-app-e1bb3-default-rtdb.firebaseio.com",
+  projectId: "cursor-app-e1bb3",
+  storageBucket: "cursor-app-e1bb3.appspot.com",
+  messagingSenderId: "124495437247",
+  appId: "1:124495437247:web:9efa0e6ced35b1925a950a",
+  measurementId: "G-J79QL01XBQ"
+};
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    // Get a reference to the Firebase Realtime Database
+    var database = firebase.database();
+
+    // Track cursor position and update in the database
+    document.addEventListener('mousemove', function(event) {
+      var cursor = document.getElementById('cursor');
+      cursor.style.left = event.pageX + 'px';
+      cursor.style.top = event.pageY + 'px';
+      // Update cursor position in the database
+      database.ref('cursors').child(firebase.auth().currentUser.uid).set({
+        x: event.pageX,
+        y: event.pageY
+      });
+    });
+  </script>
+</body>
+</html>
