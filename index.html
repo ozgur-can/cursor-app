@@ -3,6 +3,9 @@
 <head>
   <title>Real-time Cursor Tracker</title>
   <style>
+     body {
+      margin: 0;
+    }
   </style>
 </head>
 <body>
@@ -31,21 +34,29 @@
     // Get a reference to the Firebase Realtime Database
     var database = firebase.database();
 
+    var userColor = {
+      r: Math.random() * 255,
+      g: Math.random() * 255,
+      b: Math.random() * 255
+    };
+
     function setup() {
       createCanvas(windowWidth, windowHeight);
       noCursor();
     }
 
     function draw() {
-      fill(255, 0, 0);
-      ellipse(mouseX, mouseY, 30, 30);
+      background(255);
+      fill(userColor.r, userColor.g, userColor.b);
+      ellipse(mouseX, mouseY, 10, 10);
     }
 
     function mouseMoved() {
-      // Update cursor position in the database
+      // Update cursor position and color in the database
       database.ref('cursors').child(firebase.auth().currentUser.uid).set({
         x: mouseX,
-        y: mouseY
+        y: mouseY,
+        color: userColor
       });
     }
   </script>
