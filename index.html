@@ -34,11 +34,13 @@
     // Get a reference to the Firebase Realtime Database
     var database = firebase.database();
 
-    var userColor = {
-      r: Math.random() * 255,
-      g: Math.random() * 255,
-      b: Math.random() * 255
+   var userColors = {
+      red: { r: 255, g: 0, b: 0 },
+      green: { r: 0, g: 255, b: 0 },
+      blue: { r: 0, g: 0, b: 255 }
     };
+
+    var currentUserColor = userColors.red; // Default color is red
 
     function setup() {
       createCanvas(windowWidth, windowHeight);
@@ -46,18 +48,27 @@
     }
 
     function draw() {
-      fill(userColor.r, userColor.g, userColor.b);
+      fill(currentUserColor.r, currentUserColor.g, currentUserColor.b);
       ellipse(mouseX, mouseY, 20, 20);
     }
 
     function mouseMoved() {
-      // Update cursor position and color in the database
+      // Update cursor position in the database
       database.ref('cursors').child(firebase.auth().currentUser.uid).set({
         x: mouseX,
         y: mouseY,
-        color: userColor
+        color: currentUserColor
       });
     }
+
+    // Function to change user color
+    function changeColor(colorName) {
+      currentUserColor = userColors[colorName];
+    }
   </script>
+
+  <button onclick="changeColor('red')">Red</button>
+<button onclick="changeColor('green')">Green</button>
+<button onclick="changeColor('blue')">Blue</button>
 </body>
 </html>
