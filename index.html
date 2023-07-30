@@ -1,63 +1,68 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Real-time Cursor Tracker</title>
+  <title>Çizim Uygulaması</title>
   <style>
-     body {
-      margin: 0;
+    #drawingCanvas {
+      border: 1px solid black;
     }
   </style>
 </head>
 <body>
-
-  <!-- Load Firebase JavaScript SDK -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
-
-  <!-- Your Firebase configuration -->
+  <canvas id="drawingCanvas" width="800" height="600"></canvas>
   <script>
-    const firebaseConfig = {
-  apiKey: "AIzaSyBFm3WQsHM8ZGb-9gf4uP-kWm5xmZ419ig",
-  authDomain: "cursor-app-e1bb3.firebaseapp.com",
-  databaseURL: "https://cursor-app-e1bb3-default-rtdb.firebaseio.com",
-  projectId: "cursor-app-e1bb3",
-  storageBucket: "cursor-app-e1bb3.appspot.com",
-  messagingSenderId: "124495437247",
-  appId: "1:124495437247:web:9efa0e6ced35b1925a950a",
-  measurementId: "G-J79QL01XBQ"
-};
+    const canvas = document.getElementById("drawingCanvas");
+    const ctx = canvas.getContext("2d");
+    let isDrawing = false;
+    let ws;
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
+    function startPosition(e) {
+      isDrawing = true;
+      draw(e);
+      if (ws) {
+        ws.send(JSON.stringify({ type: "start", x: e.clientX - canvas.offsetLeft, y: e.clientY - canvas.offsetTop }));
+      }
+    }
 
-    // Get a reference to the Firebase Realtime Database
-    var database = firebase.database();
+    function endPosition() {
+      isDrawing = false;
+      ctx.beginPath();
+      if (ws) {
+        ws.send(JSON.stringify({ type: "end" }));
+      }
+    }
 
-   var userColor = {
-      r: Math.floor(Math.random() * 256),
-      g: Math.floor(Math.random() * 256),
-      b: Math.floor(Math.random() * 256)
+    function draw(e) {
+      if (!isDrawing) return;
+      ctx.lineWidth = 5;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = "black";
+      ctx.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+      if (ws) {
+        ws.send(JSON.stringify({ type: "draw", x: e.clientX - canvas.offsetLeft, y: e.clientY - canvas.offsetTop }));
+      }
+    }
+
+    canvas.addEventListener("mousedown", startPosition);
+    canvas.addEventListener("mouseup", endPosition);
+    canvas.addEventListener("mousemove", draw);
+
+    // WebSocket bağlantısını oluştur
+    ws = new WebSocket("ws://localhost:3000");
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === "start") {
+        startPosition({ clientX: data.x, clientY: data.y });
+      } else if (data.type === "end") {
+        endPosition();
+      } else if (data.type === "draw") {
+        draw({ clientX: data.x, clientY: data.y });
+      }
     };
-
-    function setup() {
-      createCanvas(windowWidth, windowHeight);
-      noCursor();
-    }
-
-    function draw() {
-      fill(userColor.r, userColor.g, userColor.b);
-      ellipse(mouseX, mouseY, 10, 10);
-    }
-
-    function mouseMoved() {
-      // Update cursor position and color in the database
-      database.ref('cursors').child(firebase.auth().currentUser.uid).set({
-        x: mouseX,
-        y: mouseY,
-        color: userColor
-      });
-    }
   </script>
 </body>
 </html>
