@@ -34,28 +34,30 @@
     // Get a reference to the Firebase Realtime Database
     var database = firebase.database();
 
-  function setup() {
+   var userColor = {
+      r: Math.floor(Math.random() * 256),
+      g: Math.floor(Math.random() * 256),
+      b: Math.floor(Math.random() * 256)
+    };
+
+    function setup() {
       createCanvas(windowWidth, windowHeight);
       noCursor();
     }
 
     function draw() {
-      background(255);
-      fill(255, 0, 0);
-      ellipse(mouseX, mouseY, 20, 20);
+      fill(userColor.r, userColor.g, userColor.b);
+      ellipse(mouseX, mouseY, 10, 10);
     }
 
     function mouseMoved() {
-      // Update cursor position in the database
+      // Update cursor position and color in the database
       database.ref('cursors').child(firebase.auth().currentUser.uid).set({
         x: mouseX,
-        y: mouseY
+        y: mouseY,
+        color: userColor
       });
     }
   </script>
-
-  <button onclick="changeColor('red')">Red</button>
-<button onclick="changeColor('green')">Green</button>
-<button onclick="changeColor('blue')">Blue</button>
 </body>
 </html>
