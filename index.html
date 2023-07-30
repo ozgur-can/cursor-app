@@ -3,17 +3,9 @@
 <head>
   <title>Real-time Cursor Tracker</title>
   <style>
-    .cursor {
-      width: 10px;
-      height: 10px;
-      background-color: red;
-      position: absolute;
-    }
   </style>
 </head>
 <body>
-  <!-- Cursor container for each user -->
-  <div class="cursor" id="cursor"></div>
 
   <!-- Load Firebase JavaScript SDK -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
@@ -45,9 +37,8 @@
     }
 
     function draw() {
-      background(255);
       fill(255, 0, 0);
-      ellipse(mouseX, mouseY, 10, 10);
+      ellipse(mouseX, mouseY, 30, 30);
     }
 
     function mouseMoved() {
